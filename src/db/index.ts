@@ -46,6 +46,13 @@ const SCHEMA_SQL = [
     created_at timestamptz NOT NULL DEFAULT now(),
     done_at timestamptz
   )`,
+  `CREATE TABLE IF NOT EXISTS audio_files (
+    id serial PRIMARY KEY,
+    key text NOT NULL UNIQUE,
+    content_type text NOT NULL,
+    data bytea NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  )`,
   `CREATE TABLE IF NOT EXISTS briefings (
     id serial PRIMARY KEY,
     handover_id integer NOT NULL,
@@ -63,10 +70,17 @@ const globalForDb = globalThis as unknown as { __uebergabeDb?: Promise<Db> };
 
 async function createDb(): Promise<Db> {
   let db: Db;
-  if (process.env.DATABASE_URL) {
+  const url = process.env.DATABASE_URL;
+  if (url && /neon\.tech/.test(url)) {
+    // Neon: HTTP-Treiber, funktioniert auch ohne offene TCP-Verbindungen.
     const { neon } = await import("@neondatabase/serverless");
     const { drizzle } = await import("drizzle-orm/neon-http");
-    db = drizzle(neon(process.env.DATABASE_URL), { schema }) as unknown as Db;
+    db = drizzle(neon(url), { schema }) as unknown as Db;
+  } else if (url) {
+    // Beliebiges Postgres (Supabase, Railway, eigener Server) über TCP.
+    const postgres = (await import("postgres")).default;
+    const { drizzle } = await import("drizzle-orm/postgres-js");
+    db = drizzle(postgres(url, { prepare: false, max: 3 }), { schema }) as unknown as Db;
   } else {
     const { PGlite } = await import("@electric-sql/pglite");
     const { drizzle } = await import("drizzle-orm/pglite");

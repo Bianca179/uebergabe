@@ -20,21 +20,23 @@ cp .env.example .env.local   # ANTHROPIC_API_KEY und ELEVENLABS_API_KEY eintrage
 npm run dev                  # http://localhost:3000
 ```
 
-Ohne `DATABASE_URL` läuft eine lokale Postgres-Datei (PGlite) unter `.data/pg`, ohne
-`BLOB_READ_WRITE_TOKEN` landen Audios unter `.data/audio`. Ohne `APP_ACCESS_CODE` gibt es kein Login.
+Ohne `DATABASE_URL` läuft eine lokale Postgres-Datei (PGlite) unter `.data/pg`. Audios liegen in
+Vercel Blob (wenn `BLOB_READ_WRITE_TOKEN` gesetzt ist), sonst in der Datenbank, lokal ohne Datenbank
+unter `.data/audio`. Ohne `APP_ACCESS_CODE` gibt es kein Login.
 
 ## Auf Vercel betreiben
 
 1. Auf vercel.com einloggen, **Add New → Project**, dieses GitHub-Repo importieren. Framework wird
    als Next.js erkannt, nichts ändern, **Deploy**.
-2. Im Projekt unter **Storage → Create Database → Neon (Postgres)**, Region **Frankfurt** wählen,
-   mit dem Projekt verbinden. Vercel setzt `DATABASE_URL` automatisch.
-3. Unter **Storage → Create → Blob** einen Store anlegen und verbinden. Vercel setzt
-   `BLOB_READ_WRITE_TOKEN` automatisch.
-4. Unter **Settings → Environment Variables** eintragen: `ANTHROPIC_API_KEY`, `ELEVENLABS_API_KEY`,
-   `APP_ACCESS_CODE` (frei wählen). Optional `ELEVENLABS_VOICE_ID`.
-5. **Deployments → Redeploy**, damit die Variablen greifen.
-6. Die Vercel-URL auf dem Handy öffnen, Code eingeben, über "Teilen → Zum Home-Bildschirm" als App ablegen.
+2. Eine Postgres-Datenbank. Entweder im Vercel-Projekt unter **Storage → Create Database → Neon**,
+   Region **Frankfurt**, mit dem Projekt verbinden (setzt `DATABASE_URL` automatisch). Oder direkt auf
+   neon.tech ein Projekt anlegen und die Verbindungs-URL als `DATABASE_URL` eintragen. Jede andere
+   Postgres-Datenbank geht auch.
+3. Unter **Settings → Environment Variables** eintragen: `ANTHROPIC_API_KEY`, `ELEVENLABS_API_KEY`,
+   `APP_ACCESS_CODE` (frei wählen). Optional `ELEVENLABS_VOICE_ID` und, wenn Audios nicht in der
+   Datenbank liegen sollen, ein Vercel-Blob-Store (`BLOB_READ_WRITE_TOKEN`).
+4. **Deployments → Redeploy**, damit die Variablen greifen.
+5. Die Vercel-URL auf dem Handy öffnen, Code eingeben, über "Teilen → Zum Home-Bildschirm" als App ablegen.
 
 ## Stack
 
