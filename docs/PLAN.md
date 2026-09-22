@@ -146,4 +146,5 @@ Variables. Keys nie in den Chat oder ins Repo.
 | `Fghah4fztZORbiKfIGAs` | Thomas Schendel | ruhig, autoritär |
 
 Modell: `eleven_multilingual_v2`. Demo-Skript und Prompt liegen unter `docs/demo/`.
-Sprachausgabe ist gesperrt, bis die offene ElevenLabs-Rechnung bezahlt ist.
+Die vier Stimmen sind dem Konto hinzugefügt (Präfix "Uebergabe"). Vertonte Demos liegen als MP3 unter `docs/demo/`.
+Voice-Settings der Demo: stability 0.45, similarity 0.8, style 0.35, speaker boost an.
