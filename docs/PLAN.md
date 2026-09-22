@@ -18,14 +18,15 @@ männlichen Stimme mit Charakter. Tasks landen in ihrer Notion-To-do-Liste.
 1. **Aufnehmen.** Großer Knopf, frei reden, Stopp. Mehrere Aufnahmen pro Abwesenheit
    sammeln sich zu einer Übergabe. Jede Aufnahme wird sofort nach dem Upload
    transkribiert (kurze Serverlaufzeit pro Schritt).
-2. **Zurück.** Sie tippt "Ich bin zurück". Server holt offene Notion-Tasks, alle
-   Transkripte der Übergabe und die erledigten Tasks seit dem letzten Briefing.
+2. **Zurück.** Sie tippt "Ich bin zurück". Server holt alle offenen Tasks (App, ab
+   Phase 1b auch Notion), alle Transkripte der Übergabe und die seit dem letzten
+   Briefing erledigten Tasks.
 3. **Denken.** Claude extrahiert Tasks (Titel, Kontext, Frist, Priorität, Person),
    gleicht sie mit Notion ab, priorisiert die Gesamtliste und schreibt das
    Briefing-Skript in der eingestellten Tonalität. Ausgabe als JSON: Tasks + Skript.
-4. **Sprechen.** ElevenLabs erzeugt das Audio. Gespeichert in Supabase Storage.
+4. **Sprechen.** ElevenLabs erzeugt das Audio. Gespeichert in Vercel Blob.
 5. **Empfangen.** Player oben, priorisierte Taskliste mit Checkboxen darunter.
-   Neue Tasks werden in Notion angelegt, bestehende nicht angefasst (nur gelesen).
+   Ab Phase 1b werden neue Tasks in Notion angelegt, bestehende nur gelesen.
 
 Der Kalender-Trigger (Briefing automatisch nach Terminende) ist Ausbaustufe.
 
@@ -35,11 +36,13 @@ Der Kalender-Trigger (Briefing automatisch nach Terminende) ist Ausbaustufe.
 |---|---|---|
 | App | Next.js (App Router), TypeScript, Tailwind, PWA | Ein Code für Handy und Rechner, Mikrofon und Audio laufen im Browser, auf den Homebildschirm legbar |
 | Hosting | Vercel | Native Next.js-Unterstützung, Functions mit langer Laufzeit, GitHub-Deploy |
-| DB, Auth, Storage | Supabase, Region Frankfurt | Postgres, Magic-Link-Login, Audio-Storage, EU |
+| Datenbank | Neon Postgres (über Vercel Marketplace, Region Frankfurt) | Ein Klick im Vercel-Dashboard, kein eigener Account |
+| Audio-Dateien | Vercel Blob | Ebenfalls ein Klick im Vercel-Dashboard |
+| Login (MVP) | Einfacher Zugangscode aus Env-Variable | Eine Nutzerin, kein Auth-Provider nötig; echter Login in Phase 3 |
 | STT | ElevenLabs Scribe | Sehr gutes Deutsch, gleicher Account wie TTS |
 | LLM | Claude (Anthropic) | Extraktion, Priorisierung, Skript |
 | TTS | ElevenLabs | Stimmen mit Charakter, Voice Clone möglich |
-| Tasks | Notion API | Bestehende To-do-Liste bleibt die Wahrheit |
+| Tasks (Phase 1b) | Notion API | Mariettas Liste; Anbindung über ihren Integrations-Token in den Einstellungen, später Notion-OAuth |
 
 Warum nicht Render oder Netlify: Netlify geht genauso, Render nur bei Bedarf an einem
 Dauerserver. Der Render-Free-Tier schläft ein und braucht 30 bis 60 Sekunden zum
@@ -71,8 +74,11 @@ Vercel Pro (ca. 20 USD/Monat).
 
 - **Phase 0, Stimm-Demo**: 30-Sekunden-Briefing mit zwei bis drei Stimmen, ohne App.
   Prüft, ob der Kern trägt, bevor gebaut wird.
-- **Phase 1, MVP**: Aufnahme, Transkription, Briefing mit Priorisierung, Notion
-  lesen und schreiben, PWA, Login für eine Nutzerin.
+- **Phase 1, MVP**: Aufnahme, Transkription, Briefing mit Priorisierung, Tasks
+  leben in der App, PWA, Zugangscode für eine Nutzerin.
+- **Phase 1b, Notion**: Marietta legt in ihrem Notion eine Integration an und trägt den
+  Token in den Einstellungen der App ein. Ab dann liest das Briefing ihre offenen
+  Tasks mit und legt neue an.
 - **Phase 2**: Kalender-Trigger, Push "Willkommen zurück", mehrere Personas,
   Tasks tippen, Briefing vorab erzeugen statt bei Rückkehr.
 - **Phase 3, Monetarisierung**: Multi-User, Stripe-Abo, Onboarding mit
@@ -101,14 +107,31 @@ Vercel Pro (ca. 20 USD/Monat).
 - ElevenLabs Starter 5 USD/Monat (Instant Voice Clone), Creator 22 USD für
   Professional Clone.
 - Anthropic und ElevenLabs-Nutzung: wenige Cent pro Briefing.
-- Supabase Free, Vercel Hobby (nicht-kommerziell) oder Pro.
+- Neon Free, Vercel Blob Free, Vercel Hobby (nicht-kommerziell) oder Pro.
 
 ## Benötigt zum Start
 
 - Anthropic API-Key
 - ElevenLabs API-Key (Starter oder höher, falls Clone)
-- Supabase-Projekt in Frankfurt: URL, anon key, service role key
-- Vercel-Account, mit diesem GitHub-Repo verbunden
-- Notion-Integration: Token, To-do-Datenbank für die Integration freigegeben, Link zur
-  Datenbank
+- Vercel-Account, mit diesem GitHub-Repo verbunden; Neon Postgres und Blob werden
+  dort per Klick hinzugefügt
+- Notion erst in Phase 1b, von Marietta selbst
 - Drei Adjektive zur Tonalität, Anrede, Entscheidung Clone oder Library-Stimme
+
+## Keys und Konfiguration
+
+Alle Keys sind Env-Variablen und jederzeit austauschbar, ohne Codeänderung:
+
+| Variable | Woher | Wann |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | console.anthropic.com | Start |
+| `ELEVENLABS_API_KEY` | elevenlabs.io | Start |
+| `ELEVENLABS_VOICE_ID` | Voice Library oder Clone | Start, änderbar in den Einstellungen |
+| `DATABASE_URL` | von Vercel beim Hinzufügen von Neon gesetzt | Start |
+| `BLOB_READ_WRITE_TOKEN` | von Vercel beim Hinzufügen von Blob gesetzt | Start |
+| `APP_ACCESS_CODE` | frei gewählt | Start |
+| Notion-Token und Datenbank-ID | Marietta, in den App-Einstellungen | Phase 1b |
+
+Für die Entwicklung in Claude Code: Umgebung unter claude.ai/code → Environments →
+Environment variables. Für den Betrieb: Vercel → Project → Settings → Environment
+Variables. Keys nie in den Chat oder ins Repo.
