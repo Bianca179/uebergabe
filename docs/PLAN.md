@@ -135,3 +135,15 @@ Alle Keys sind Env-Variablen und jederzeit austauschbar, ohne Codeänderung:
 Für die Entwicklung in Claude Code: Umgebung unter claude.ai/code → Environments →
 Environment variables. Für den Betrieb: Vercel → Project → Settings → Environment
 Variables. Keys nie in den Chat oder ins Repo.
+
+## Stimm-Kandidaten (ElevenLabs Voice Library, Deutsch, männlich)
+
+| Voice ID | Name | Charakter |
+|---|---|---|
+| `RqYtbPVBBytc1OIowrh0` | Paul | warm, charmant, entspannt; erster Favorit |
+| `kkJxCnlRCckmfFvzDW5Q` | Alexander | tief, vertraute TV-Stimme |
+| `Ay1WwRHxUsu3hEeAp8JZ` | Anton | tiefer Bariton, ernst, intensiv |
+| `Fghah4fztZORbiKfIGAs` | Thomas Schendel | ruhig, autoritär |
+
+Modell: `eleven_multilingual_v2`. Demo-Skript und Prompt liegen unter `docs/demo/`.
+Sprachausgabe ist gesperrt, bis die offene ElevenLabs-Rechnung bezahlt ist.
