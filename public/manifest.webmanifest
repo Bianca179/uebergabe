@@ -1,0 +1,14 @@
+{
+  "name": "Übergabe",
+  "short_name": "Übergabe",
+  "description": "Sprich deine offenen Punkte ein. Hör dein Briefing, wenn du zurück bist.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#14110f",
+  "theme_color": "#14110f",
+  "lang": "de",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

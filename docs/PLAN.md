@@ -1,5 +1,7 @@
 # Übergabe – Plan (Stand 2026-09-22)
 
+> Status: Phase 1 (MVP) ist gebaut und lokal Ende-zu-Ende getestet. Setup-Anleitung in der README.
+
 Sprach-Übergabe an das zukünftige Ich: Marietta spricht vor dem Training ihre offenen
 Punkte ein und bekommt bei der Rückkehr ein priorisiertes Audio-Briefing in einer
 männlichen Stimme mit Charakter. Tasks landen in ihrer Notion-To-do-Liste.
