@@ -1,4 +1,10 @@
-import { integer, pgTable, real, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { customType, integer, pgTable, real, serial, text, timestamp } from "drizzle-orm/pg-core";
+
+const bytea = customType<{ data: Uint8Array; driverData: Uint8Array }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -55,6 +61,14 @@ export const briefings = pgTable("briefings", {
   audioPath: text("audio_path"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   playedAt: timestamp("played_at", { withTimezone: true }),
+});
+
+export const audioFiles = pgTable("audio_files", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  contentType: text("content_type").notNull(),
+  data: bytea("data").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export type User = typeof users.$inferSelect;
