@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #14110f;
+  --bg-elev: #1e1a17;
+  --fg: #f3ede6;
+  --muted: #a89f95;
+  --accent: #d9a15b;
+  --accent-fg: #14110f;
+  --danger: #e2574b;
+  --border: #2c2622;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.85rem 1.4rem;
+  font-weight: 600;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; }
+.btn-primary { background: var(--accent); color: var(--accent-fg); }
+.btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--border); }
+
+.input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  color: var(--fg);
+}
+.input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(226, 87, 75, 0.55); }
+  100% { box-shadow: 0 0 0 28px rgba(226, 87, 75, 0); }
+}
+.recording { animation: pulse-ring 1.4s ease-out infinite; }

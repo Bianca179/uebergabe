@@ -1,5 +1,7 @@
 # Übergabe – Plan (Stand 2026-09-22)
 
+> Status: Phase 1 (MVP) ist gebaut und lokal Ende-zu-Ende getestet. Setup-Anleitung in der README.
+
 Sprach-Übergabe an das zukünftige Ich: Marietta spricht vor dem Training ihre offenen
 Punkte ein und bekommt bei der Rückkehr ein priorisiertes Audio-Briefing in einer
 männlichen Stimme mit Charakter. Tasks landen in ihrer Notion-To-do-Liste.
@@ -135,3 +137,16 @@ Alle Keys sind Env-Variablen und jederzeit austauschbar, ohne Codeänderung:
 Für die Entwicklung in Claude Code: Umgebung unter claude.ai/code → Environments →
 Environment variables. Für den Betrieb: Vercel → Project → Settings → Environment
 Variables. Keys nie in den Chat oder ins Repo.
+
+## Stimm-Kandidaten (ElevenLabs Voice Library, Deutsch, männlich)
+
+| Voice ID | Name | Charakter |
+|---|---|---|
+| `RqYtbPVBBytc1OIowrh0` | Paul | warm, charmant, entspannt; erster Favorit |
+| `kkJxCnlRCckmfFvzDW5Q` | Alexander | tief, vertraute TV-Stimme |
+| `Ay1WwRHxUsu3hEeAp8JZ` | Anton | tiefer Bariton, ernst, intensiv |
+| `Fghah4fztZORbiKfIGAs` | Thomas Schendel | ruhig, autoritär |
+
+Modell: `eleven_multilingual_v2`. Demo-Skript und Prompt liegen unter `docs/demo/`.
+Die vier Stimmen sind dem Konto hinzugefügt (Präfix "Uebergabe"). Vertonte Demos liegen als MP3 unter `docs/demo/`.
+Voice-Settings der Demo: stability 0.45, similarity 0.8, style 0.35, speaker boost an.
