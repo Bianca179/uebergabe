@@ -61,3 +61,14 @@ export async function readAudio(relative: string): Promise<{ data: Uint8Array; c
     return null;
   }
 }
+
+/** Loads a stored recording by the URL that storeAudio returned. */
+export async function loadAudio(audioPath: string): Promise<{ data: Uint8Array; contentType: string } | null> {
+  if (audioPath.startsWith("/api/audio/")) return readAudio(audioPath.slice("/api/audio/".length));
+  if (/^https?:\/\//.test(audioPath)) {
+    const res = await fetch(audioPath);
+    if (!res.ok) return null;
+    return { data: new Uint8Array(await res.arrayBuffer()), contentType: res.headers.get("content-type") ?? "application/octet-stream" };
+  }
+  return null;
+}

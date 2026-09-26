@@ -3,8 +3,9 @@ import { eq } from "drizzle-orm";
 import { getDb, USER_ID, schema } from "@/db";
 import { getDoneSince, getLatestBriefing, getOpenHandover, getOpenTasks, getRecordings, getUser } from "@/lib/state";
 import { generateBriefing } from "@/lib/briefing";
-import { DEFAULT_VOICE_ID, synthesize } from "@/lib/elevenlabs";
-import { storeAudio } from "@/lib/storage";
+import { DEFAULT_VOICE_ID, synthesize, transcribe } from "@/lib/elevenlabs";
+import { loadAudio, storeAudio } from "@/lib/storage";
+import { errorMessage } from "@/lib/secrets";
 
 export const maxDuration = 300;
 
@@ -15,6 +16,21 @@ export async function POST() {
   const [recs, openTasks, latest] = await Promise.all([getRecordings(handover.id), getOpenTasks(), getLatestBriefing()]);
   const doneSinceLast = await getDoneSince(latest?.createdAt ?? null);
 
+  // Aufnahmen ohne Transkript (z. B. nach einem Fehler beim Upload) jetzt nachholen.
+  for (const r of recs) {
+    if (r.transcript && r.transcript.trim()) continue;
+    try {
+      const audio = await loadAudio(r.audioPath);
+      if (!audio) continue;
+      const ext = r.audioPath.split(".").pop() ?? "webm";
+      const text = await transcribe(new Blob([Buffer.from(audio.data)], { type: audio.contentType }), `aufnahme.${ext}`);
+      r.transcript = text;
+      await db.update(schema.recordings).set({ transcript: text }).where(eq(schema.recordings.id, r.id));
+    } catch {
+      // Einzelne Aufnahme überspringen, das Briefing läuft trotzdem.
+    }
+  }
+
   const transcripts = recs
     .filter((r) => r.transcript && r.transcript.trim().length > 0)
     .map((r) => ({ at: r.createdAt, text: r.transcript as string }));
@@ -23,7 +39,7 @@ export async function POST() {
   try {
     out = await generateBriefing({ user, transcripts, openTasks, doneSinceLast, now: new Date() });
   } catch (e) {
-    return NextResponse.json({ error: `Briefing fehlgeschlagen: ${e instanceof Error ? e.message : String(e)}` }, { status: 502 });
+    return NextResponse.json({ error: `Briefing fehlgeschlagen: ${errorMessage(e)}` }, { status: 502 });
   }
 
   if (out.new_tasks.length > 0) {
@@ -50,7 +66,7 @@ export async function POST() {
     const mp3 = await synthesize(out.script, user.voiceId || DEFAULT_VOICE_ID);
     audioPath = await storeAudio(`briefings/${handover.id}.mp3`, mp3, "audio/mpeg");
   } catch (e) {
-    audioError = e instanceof Error ? e.message : String(e);
+    audioError = errorMessage(e);
   }
 
   const [briefing] = await db

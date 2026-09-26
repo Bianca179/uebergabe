@@ -1,12 +1,12 @@
+import { readKey } from "@/lib/secrets";
+
 const BASE = "https://api.elevenlabs.io/v1";
 
 function key(): string {
-  const k = process.env.ELEVENLABS_API_KEY;
-  if (!k) throw new Error("ELEVENLABS_API_KEY fehlt");
-  return k;
+  return readKey("ELEVENLABS_API_KEY");
 }
 
-export const DEFAULT_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "RqYtbPVBBytc1OIowrh0";
+export const DEFAULT_VOICE_ID = (process.env.ELEVENLABS_VOICE_ID ?? "").trim().split(/\s+/)[0] || "RqYtbPVBBytc1OIowrh0";
 
 export async function transcribe(file: Blob, filename: string): Promise<string> {
   const form = new FormData();

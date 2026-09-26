@@ -4,6 +4,7 @@ import { getDb, schema } from "@/db";
 import { getOpenHandover } from "@/lib/state";
 import { storeAudio } from "@/lib/storage";
 import { transcribe } from "@/lib/elevenlabs";
+import { errorMessage } from "@/lib/secrets";
 
 export const maxDuration = 120;
 
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     transcript = await transcribe(file, `aufnahme.${ext}`);
     await db.update(schema.recordings).set({ transcript }).where(eq(schema.recordings.id, rec.id));
   } catch (e) {
-    transcriptError = e instanceof Error ? e.message : String(e);
+    transcriptError = errorMessage(e);
   }
   return NextResponse.json({ id: rec.id, transcript, transcriptError });
 }

@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import type { Task, User } from "@/db/schema";
+import { readKey } from "@/lib/secrets";
 
 const NewTask = z.object({
   title: z.string().describe("Kurzer, konkreter Aufgabentitel, max. 80 Zeichen"),
@@ -73,7 +74,7 @@ function userMessage(input: BriefingInput): string {
 }
 
 export async function generateBriefing(input: BriefingInput): Promise<BriefingOutput> {
-  const client = new Anthropic();
+  const client = new Anthropic({ apiKey: readKey("ANTHROPIC_API_KEY") });
   const response = await client.messages.parse({
     model: "claude-opus-5",
     max_tokens: 8000,
